@@ -1,15 +1,15 @@
 /***************************************************************************
-  * 
-  * Homework for chapter 5 -- Acoustic Echo Cancellation
-  *
-  * In the main function, we have finished data preparation for you.
-  * Input signal and reference signal, input.pcm & ref.pcm, are read,
-  * frame by frame. Then AEC is applied.
-  *
-  * The format of input/output audio is pcm ".raw". You can use Audition 
-  * or Cooledit to see the waveform or spectrogram of pcm audio files.
-  * 
-  **************************************************************************/
+ *
+ * Homework for chapter 5 -- Acoustic Echo Cancellation
+ *
+ * In the main function, we have finished data preparation for you.
+ * Input signal and reference signal, input.pcm & ref.pcm, are read,
+ * frame by frame. Then AEC is applied.
+ *
+ * The format of input/output audio is pcm ".raw". You can use Audition
+ * or Cooledit to see the waveform or spectrogram of pcm audio files.
+ *
+ **************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,24 +20,24 @@
 
 const int array_frm_len = 128;
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    if(argc != 4)
+    if (argc != 4)
     {
         printf("usage: %s input.raw ref.raw aec_output.raw\r\n", argv[0]);
         return -1;
     }
 
     int ii;
-    
+
     FILE *fpin = NULL;
     FILE *fpref = NULL;
     FILE *fpout = NULL;
-    short *ptr_input_data = (short*)calloc(array_frm_len, sizeof(short));
-    short *ptr_output_data = (short*)calloc(array_frm_len, sizeof(short));
-    short *ptr_temp = (short*)calloc(array_frm_len, sizeof(short));
-    short *ptr_ref_data = (short*)calloc(array_frm_len, sizeof(short));
-   
+    short *ptr_input_data = (short *)calloc(array_frm_len, sizeof(short));
+    short *ptr_output_data = (short *)calloc(array_frm_len, sizeof(short));
+    short *ptr_temp = (short *)calloc(array_frm_len, sizeof(short));
+    short *ptr_ref_data = (short *)calloc(array_frm_len, sizeof(short));
+
     fpin = fopen(argv[1], "rb");
     fseek(fpin, 0, SEEK_END);
     long file_len = ftell(fpin);
@@ -51,18 +51,20 @@ int main(int argc, char** argv)
 
     // TDE Begin
     int delay = 0;
-    short* ptr_input_for_tde = (short*)calloc(array_frm_len * 128, sizeof(short));
-    short* ptr_ref_for_tde = (short*)calloc(array_frm_len * 128, sizeof(short));
+    short *ptr_input_for_tde = (short *)calloc(array_frm_len * 128, sizeof(short));
+    short *ptr_ref_for_tde = (short *)calloc(array_frm_len * 128, sizeof(short));
     fread(ptr_input_for_tde, sizeof(short), array_frm_len * 128, fpin);
     fread(ptr_ref_for_tde, sizeof(short), array_frm_len * 128, fpref);
     delay = dios_ssp_tde(ptr_input_for_tde, ptr_ref_for_tde, array_frm_len * 128);
+    printf("inputdata_length = %d\n", array_frm_len * 128);
+    printf("delay = %d\n", delay);
     // TDE End
 
     // AEC Begin
-    void* st;
+    void *st;
     st = dios_ssp_init_api(delay);
     dios_ssp_reset_api(st);
-    for(ii = 0; ii < frame_num; ii++)
+    for (ii = 0; ii < frame_num; ii++)
     {
         // prepare input signal
         fread(ptr_temp, sizeof(short), array_frm_len, fpin);
@@ -91,4 +93,3 @@ int main(int argc, char** argv)
     printf("process finished.\r\n");
     return 0;
 }
-
